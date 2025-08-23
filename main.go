@@ -3,6 +3,7 @@ package main
 import (
 	"embed"
 
+	"github.com/donnykd/mpv-playlist/backend"
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
@@ -14,7 +15,8 @@ var assets embed.FS
 func main() {
 	// Create an instance of the app structure
 	app := NewApp()
-
+	
+	backend.Play("/home/khalid/Downloads/ssstwitter.com_1754318376612.mp4")
 	// Create application with options
 	err := wails.Run(&options.App{
 		Title:  "mpv-playlist",

@@ -1,8 +1,13 @@
-module mpv-playlist
+module github.com/donnykd/mpv-playlist
 
-go 1.23
+go 1.23.2
 
-require github.com/wailsapp/wails/v2 v2.10.2
+toolchain go1.24.6
+
+require (
+	github.com/dexterlb/mpvipc v0.0.0-20241005113212-7cdefca0e933
+	github.com/wailsapp/wails/v2 v2.10.2
+)
 
 require (
 	github.com/bep/debounce v1.2.1 // indirect
@@ -32,6 +37,7 @@ require (
 	golang.org/x/net v0.35.0 // indirect
 	golang.org/x/sys v0.30.0 // indirect
 	golang.org/x/text v0.22.0 // indirect
+	gopkg.in/natefinch/npipe.v2 v2.0.0-20160621034901-c1b8fa8bdcce // indirect
 )
 
 // replace github.com/wailsapp/wails/v2 v2.10.2 => /home/khalid/repos/personal
