@@ -51,7 +51,7 @@ func NewPlayer() (p *Player) {
 }
 
 func (p *Player) Play(file string) {
-	// defer p.conn.Close()
+	defer p.conn.Close()
 
 	_, err := p.conn.Call("loadfile", file)
 	if err != nil {
