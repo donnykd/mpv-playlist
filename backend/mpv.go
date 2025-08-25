@@ -4,39 +4,63 @@ import (
 	"fmt"
 	"log"
 	"os/exec"
+	"sync"
 
 	"github.com/dexterlb/mpvipc"
 )
 
-func Play(file string){
-	
+type Player struct {
+	socket string
+	conn   *mpvipc.Connection
+}
+
+func NewPlayer() (p *Player) {
 	socket := "/tmp/mpv_rpc"
-	
-	if !mpv_exists(){
+	var conn *mpvipc.Connection
+
+	if !mpvExists() {
 		log.Fatal("MPV player not installed on this machine")
 	}
-	
-	cmd := exec.Command("mpv", "--idle", "--input-ipc-server=" + socket)
-	err := cmd.Start()
-	if err != nil{
-		log.Fatalf("could not start mpv: %v", err)
+
+	cmd := exec.Command("mpv", "--idle", "--input-ipc-server="+socket)
+
+	var wg sync.WaitGroup
+	wg.Add(1)
+
+	go func() {
+		defer wg.Done()
+
+		err := cmd.Start()
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		conn = mpvipc.NewConnection(socket)
+		err = conn.Open()
+		if err != nil {
+			log.Fatalf("error opening connection: %v", err)
+		}
+	}()
+
+	wg.Wait()
+
+	return &Player{
+		socket: socket,
+		conn:   conn,
 	}
-	
-	conn := mpvipc.NewConnection(socket)
-	err = conn.Open()
-	if err != nil {
-		log.Fatalf("error opening connection: %v", err)
-	}
-	defer conn.Close()
-	
-	_, err = conn.Call("loadfile", file)	
+}
+
+func (p *Player) Play(file string) {
+	// defer p.conn.Close()
+
+	_, err := p.conn.Call("loadfile", file)
 	if err != nil {
 		log.Fatalf("error: %v", err)
 	}
 	fmt.Printf("current file playing: %s", file)
 }
 
-func mpv_exists() bool {
+func mpvExists() bool {
 	_, err := exec.LookPath("mpv")
 	return err == nil
 }
