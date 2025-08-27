@@ -5,6 +5,7 @@ import (
 	"log"
 	"os/exec"
 	"sync"
+	"time"
 
 	"github.com/dexterlb/mpvipc"
 )
@@ -36,9 +37,22 @@ func NewPlayer() (p *Player) {
 		}
 
 		conn = mpvipc.NewConnection(socket)
-		err = conn.Open()
-		if err != nil {
-			log.Fatalf("error opening connection: %v", err)
+
+		retries := 10
+		delay := 10 * time.Millisecond
+
+		for i := range retries{
+			
+			err = conn.Open()
+			if err == nil {
+				break
+			}
+
+			if i == retries-1 {
+				log.Fatalf("error opening connection: %v", err)
+			}
+
+			time.Sleep(delay)
 		}
 	}()
 
