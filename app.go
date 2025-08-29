@@ -4,19 +4,19 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/donnykd/mpv-playlist/backend"
+	"github.com/donnykd/mpv-playlist/backend/player"
 )
 
 // App struct
 type App struct {
 	ctx    context.Context
-	player backend.Player
+	player *player.Player
 }
 
 // NewApp creates a new App application struct
 func NewApp() *App {
 	return &App{
-		player: *backend.NewPlayer(),
+		player: player.NewPlayer(),
 	}
 }
 
@@ -24,7 +24,11 @@ func NewApp() *App {
 // so we can call the runtime methods
 func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
-	a.player.Play("/home/khalid/Downloads/ssstwitter.com_1754318376612.mp4")
+	// a.player.Play("/home/khalid/Downloads/ssstwitter.com_1754318376612.mp4")	
+	 
+	a.player.AddFile("/home/khalid/Downloads/ssstwitter.com_1754318376612.mp4")
+	a.player.AddFile("/home/khalid/Downloads/ssstwitter.com_1754318376612.mp4")
+	a.player.PlayAll()
 }
 
 // Greet returns a greeting for the given name

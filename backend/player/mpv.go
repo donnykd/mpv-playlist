@@ -1,4 +1,4 @@
-package backend
+package player
 
 import (
 	"fmt"
@@ -8,11 +8,13 @@ import (
 	"time"
 
 	"github.com/dexterlb/mpvipc"
+	"github.com/donnykd/mpv-playlist/backend/playlist"
 )
 
 type Player struct {
 	socket string
 	conn   *mpvipc.Connection
+	playlist *playlist.Playlist
 }
 
 func NewPlayer() (p *Player) {
@@ -37,22 +39,11 @@ func NewPlayer() (p *Player) {
 		}
 
 		conn = mpvipc.NewConnection(socket)
+		err = conn.Open()
 
-		retries := 10
-		delay := 10 * time.Millisecond
-
-		for i := range retries{
-			
-			err = conn.Open()
-			if err == nil {
-				break
-			}
-
-			if i == retries-1 {
-				log.Fatalf("error opening connection: %v", err)
-			}
-
-			time.Sleep(delay)
+		time.Sleep(300 * time.Millisecond)
+		if err != nil {
+			log.Fatalf("error opening connection: %v", err)
 		}
 	}()
 
@@ -61,17 +52,29 @@ func NewPlayer() (p *Player) {
 	return &Player{
 		socket: socket,
 		conn:   conn,
+		playlist: playlist.NewPlaylist(),
 	}
 }
 
 func (p *Player) Play(file string) {
-	defer p.conn.Close()
-
 	_, err := p.conn.Call("loadfile", file)
 	if err != nil {
 		log.Fatalf("error: %v", err)
 	}
 	fmt.Printf("current file playing: %s", file)
+}
+
+func (p *Player) PlayAll() {
+	playlistPath, err := p.playlist.GenerateM3uFile()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	p.Play(playlistPath)
+}
+
+func (p *Player) AddFile(file string) {
+	p.playlist.AddFile(file) 
 }
 
 func mpvExists() bool {
