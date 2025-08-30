@@ -24,8 +24,7 @@ func NewApp() *App {
 // so we can call the runtime methods
 func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
-	// a.player.Play("/home/khalid/Downloads/ssstwitter.com_1754318376612.mp4")	
-	 
+
 	a.player.AddFile("/home/khalid/Downloads/ssstwitter.com_1754318376612.mp4")
 	a.player.AddFile("/home/khalid/Downloads/ssstwitter.com_1754318376612.mp4")
 	a.player.PlayAll()

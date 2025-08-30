@@ -12,8 +12,8 @@ import (
 )
 
 type Player struct {
-	socket string
-	conn   *mpvipc.Connection
+	socket   string
+	conn     *mpvipc.Connection
 	playlist *playlist.Playlist
 }
 
@@ -32,31 +32,38 @@ func NewPlayer() (p *Player) {
 
 	go func() {
 		defer wg.Done()
-
 		err := cmd.Start()
 		if err != nil {
 			log.Fatal(err)
 		}
 
 		conn = mpvipc.NewConnection(socket)
-		err = conn.Open()
 
-		time.Sleep(300 * time.Millisecond)
-		if err != nil {
-			log.Fatalf("error opening connection: %v", err)
+		maxRetries := 10
+		for i := range maxRetries {
+			err = conn.Open()
+			if err == nil {
+				return
+			}
+
+			waitTime := min(50*time.Millisecond<<i, time.Second)
+
+			time.Sleep(waitTime)
 		}
+
+		log.Fatalf("error opening connection after %d retries: %v", maxRetries, err)
 	}()
 
 	wg.Wait()
 
 	return &Player{
-		socket: socket,
-		conn:   conn,
+		socket:   socket,
+		conn:     conn,
 		playlist: playlist.NewPlaylist(),
 	}
 }
 
-func (p *Player) Play(file string) {
+func (p *Player) play(file string) {
 	_, err := p.conn.Call("loadfile", file)
 	if err != nil {
 		log.Fatalf("error: %v", err)
@@ -70,11 +77,19 @@ func (p *Player) PlayAll() {
 		log.Fatal(err)
 	}
 
-	p.Play(playlistPath)
+	p.play(playlistPath)
 }
 
 func (p *Player) AddFile(file string) {
-	p.playlist.AddFile(file) 
+	if !isFileValid(file) {
+		log.Fatal("File is not valid")
+	}
+
+	path, err := normalizePath(file)
+	if err != nil {
+		log.Fatal(err)
+	}
+	p.playlist.AddFile(path)
 }
 
 func mpvExists() bool {
