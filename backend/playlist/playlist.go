@@ -46,7 +46,7 @@ func (p *Playlist) Clear() {
 }
 
 func (p *Playlist) RemoveFile(index int) error {
-	if index < 0 || index > len(p.paths) {
+	if index < 0 || index >= len(p.paths) {
 		return fmt.Errorf("index out range")
 	}
 
@@ -55,7 +55,7 @@ func (p *Playlist) RemoveFile(index int) error {
 }
 
 func (p *Playlist) IsEmpty() bool {
-	return len(p.paths) > 0
+	return len(p.paths) == 0
 }
 
 func (p *Playlist) Count() int {
