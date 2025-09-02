@@ -8,7 +8,7 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
 )
 
-//go:embed all:frontend/dist
+//go:embed frontend/dist
 var assets embed.FS
 
 func main() {
@@ -18,8 +18,8 @@ func main() {
 	// Create application with options
 	err := wails.Run(&options.App{
 		Title:  "mpv-playlist",
-		Width:  1024,
-		Height: 768,
+		Width:  600,
+		Height: 400,
 		AssetServer: &assetserver.Options{
 			Assets: assets,
 		},

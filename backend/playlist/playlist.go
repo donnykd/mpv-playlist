@@ -1,3 +1,4 @@
+// Package playlist provides a simple playlist structure for managing collection of video files.
 package playlist
 
 import (
